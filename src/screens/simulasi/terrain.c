@@ -3,23 +3,6 @@
 #include "raylib.h"
 #include <math.h>
 
-// =============================================================================
-// Titik-titik sungai berkelok
-// Ini adalah array koordinat (x,y) layar yang membentuk jalur sungai.
-// Sungai mengalir dari kiri-tengah ke kanan-bawah membelah hutan.
-// Semakin banyak titik = semakin berkelok = nilai koordinat lebih tinggi.
-// =============================================================================
-// static int riverX[] = { 120, 160, 210, 270, 310, 360, 400, 460, 510, 560, 610, 670, 720, 780, 840, 900, 960 };
-// static int riverY[] = { 390, 410, 395, 420, 405, 430, 415, 440, 420, 445, 425, 450, 430, 445, 435, 450, 440 };
-// #define RIVER_POINTS 17
-// #define RIVER_WIDTH   6   // lebar sungai dalam piksel (digambar berlapis)
-
-// =============================================================================
-// Helper: scan-fill segitiga untuk bukit
-// Sama persis logikanya dengan FillTriangle di tree.c,
-// dibuat ulang di sini agar terrain.c tidak bergantung ke tree.c
-// Pakai BresenhamLine horizontal per baris
-// =============================================================================
 static void FillTriangleTerrain(int tx, int ty,
                                  int blx, int bly,
                                  int brx, int bry,
@@ -36,24 +19,13 @@ static void FillTriangleTerrain(int tx, int ty,
 }
 
 // =============================================================================
-// Helper: scan-fill persegi panjang (untuk tanah & rumput)
-// Loop BresenhamLine horizontal dari y1 ke y2
-// =============================================================================
+
 static void FillRectTerrain(int x1, int y1, int x2, int y2, Color col) {
     for (int y = y1; y <= y2; y++) {
         BresenhamLine(x1, y, x2, y, col);
     }
 }
 
-// =============================================================================
-// DrawHills — bukit berlapis di latar belakang
-//
-// Strategi: 3 bukit dengan posisi & ukuran berbeda, warna makin terang
-// ke depan (atmospheric perspective sederhana)
-//
-// Bukit digambar sebagai segitiga besar menggunakan FillTriangleTerrain()
-// Urutan: belakang (gelap) → depan (terang) agar tumpuk dengan benar
-// =============================================================================
 static void DrawHills(void) {
 
     // --- Bukit paling belakang (kiri) ---
@@ -104,13 +76,6 @@ static void DrawHills(void) {
     BresenhamLine(500, HILL_Y - 120,      780,  GROUND_Y - 120, hillEdge);
 }
 
-// =============================================================================
-// DrawGround — tanah dan lapisan rumput di atasnya
-//
-// Lapisan rumput : GROUND_Y sampai GROUND_Y+12  → hijau
-// Lapisan tanah  : GROUND_Y+12 sampai SCREEN_H  → coklat
-// Keduanya pakai FillRectTerrain (loop BresenhamLine horizontal)
-// =============================================================================
 static void DrawGround(void) {
     // Tanah coklat
     Color soil = (Color){110, 75, 35, 255};
@@ -126,50 +91,6 @@ static void DrawGround(void) {
 }
 
 // =============================================================================
-// DrawRiver — sungai berkelok dari array titik
-//
-// Cara menggambar:
-//   Untuk setiap pasang titik berurutan [i] → [i+1],
-//   gambar BresenhamLine() sebanyak RIVER_WIDTH kali dengan offset Y
-//   agar sungai tampak punya lebar.
-//
-// Warna: biru gelap (dasar) + biru terang (highlight tengah)
-// =============================================================================
-// static void DrawRiver(void) {
-//     Color riverDeep    = (Color){50,  100, 180, 220};
-//     Color riverShallow = (Color){80,  150, 220, 200};
-//     Color riverLight   = (Color){120, 180, 240, 180};
-
-//     for (int i = 0; i < RIVER_POINTS - 1; i++) {
-//         int x1 = riverX[i],     y1 = riverY[i];
-//         int x2 = riverX[i + 1], y2 = riverY[i + 1];
-
-//         // Gambar berlapis: offset -2 sampai +2 dari garis tengah
-//         for (int off = -RIVER_WIDTH / 2; off <= RIVER_WIDTH / 2; off++) {
-//             Color col;
-//             if (off == 0 || off == 1)      col = riverLight;    // tengah terang
-//             else if (abs(off) <= 2)        col = riverShallow;  // tengah
-//             else                           col = riverDeep;      // tepi
-
-//             BresenhamLine(x1, y1 + off, x2, y2 + off, col);
-//         }
-//     }
-
-//     // Outline tepi sungai — garis gelap di atas dan bawah
-//     Color riverEdge = (Color){30, 70, 140, 255};
-//     for (int i = 0; i < RIVER_POINTS - 1; i++) {
-//         // Tepi atas
-//         BresenhamLine(riverX[i], riverY[i] - RIVER_WIDTH / 2,
-//                       riverX[i+1], riverY[i+1] - RIVER_WIDTH / 2,
-//                       riverEdge);
-//         // Tepi bawah
-//         BresenhamLine(riverX[i], riverY[i] + RIVER_WIDTH / 2,
-//                       riverX[i+1], riverY[i+1] + RIVER_WIDTH / 2,
-//                       riverEdge);
-//     }
-// }
-
-// =============================================================================
 // TerrainDraw 
 // =============================================================================
 void TerrainDraw(void) {
@@ -178,35 +99,3 @@ void TerrainDraw(void) {
     // DrawRiver();
 }
 
-// =============================================================================
-// TerrainIsRiver — cek apakah titik (x,y) berada di atas jalur sungai
-// Dipakai oleh GridUpdate untuk mencegah api menyeberang sungai
-//
-// Cara: cek apakah (x,y) dekat dengan salah satu segmen sungai
-// Menggunakan jarak titik ke garis sederhana
-// =============================================================================
-// int TerrainIsRiver(int x, int y) {
-//     for (int i = 0; i < RIVER_POINTS - 1; i++) {
-//         int x1 = riverX[i],     y1 = riverY[i];
-//         int x2 = riverX[i + 1], y2 = riverY[i + 1];
-
-//         // Vektor segmen
-//         float dx = (float)(x2 - x1);
-//         float dy = (float)(y2 - y1);
-//         float len2 = dx*dx + dy*dy;
-//         if (len2 == 0.0f) continue;
-
-//         // Proyeksi titik ke segmen
-//         float t = ((x - x1)*dx + (y - y1)*dy) / len2;
-//         if (t < 0.0f) t = 0.0f;
-//         if (t > 1.0f) t = 1.0f;
-
-//         float px = x1 + t*dx;
-//         float py = y1 + t*dy;
-
-//         // Jarak titik ke segmen
-//         float dist = sqrtf((x - px)*(x - px) + (y - py)*(y - py));
-//         if (dist <= (float)(RIVER_WIDTH / 2 + 2)) return 1;
-//     }
-//     return 0;
-// }

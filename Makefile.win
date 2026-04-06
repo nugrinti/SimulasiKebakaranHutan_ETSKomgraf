@@ -39,6 +39,7 @@ SRCS = main.c \
        src/screens/simulasi/terrain.c \
        src/screens/simulasi/fire_simulation.c \
        src/screens/simulasi/wind.c \
+       src/screens/simulasi/particle.c \
        src/screens/simulasi/menu.c \
        src/screens/help/help.c \
        src/screens/about/about.c \

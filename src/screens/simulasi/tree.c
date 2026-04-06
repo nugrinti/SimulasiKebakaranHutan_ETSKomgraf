@@ -1,12 +1,9 @@
 #include "tree.h"
-#include "src/algo/bresenham.h"   // BresenhamLine()
-#include "src/algo/midcircle.h"   // Midcircle(), MidcircleFilled()
+#include "src/algo/bresenham.h"   
+#include "src/algo/midcircle.h"  
 #include "raylib.h"
 #include <math.h>
 
-// =============================================================================
-// Helper internal: scan-fill segitiga (isi warna solid tanpa DrawTriangle)
-// Menggunakan BresenhamLine() horizontal per baris — sesuai aturan manual
 // =============================================================================
 //   (tx, ty)          = puncak segitiga
 //   (blx,bly),(brx,bry) = pojok kiri-bawah dan kanan-bawah
@@ -29,9 +26,6 @@ static void FillTriangle(int tx, int ty,
     }
 }
 
-// =============================================================================
-// Helper internal: isi persegi panjang (batang pohon) secara manual
-// Loop BresenhamLine() horizontal per baris
 // =============================================================================
 static void FillRect(int x1, int y1, int x2, int y2, Color col) {
     for (int y = y1; y <= y2; y++) {
@@ -66,13 +60,7 @@ void TreeUpdate(Tree *t, float dt) {
 }
 
 // =============================================================================
-// TreeDraw — gambar pohon sesuai state
-//
-// Koordinat referensi:
-//   (t->x, t->y)              = tengah bawah batang
-//   batang   : lebar trunkW, tinggi trunkH  → ke atas dari t->y
-//   mahkota  : 3 segitiga berlapis di atas batang
-//   bayangan : ellips pipih di bawah batang
+// TreeDraw 
 // =============================================================================
 void TreeDraw(const Tree *t, float time, float windSpeed) {
 
@@ -91,9 +79,6 @@ void TreeDraw(const Tree *t, float time, float windSpeed) {
     if (t->state == TREE_HEALTHY) {
 
         // 1. Bayangan — ellips pipih di tanah
-        //    Gunakan Midcircle dari repo, tapi gambar berulang dengan
-        //    offset Y dikompres (skala Y = 0.3) untuk efek ellips
-        //    → karena Midcircle hanya bisa lingkaran, kita scan manual
         int shadowRx = t->crownSize;          // radius horizontal bayangan
         int shadowRy = t->crownSize / 4;      // radius vertikal (pipih)
         Color shadowCol = (Color){0, 0, 0, 60};

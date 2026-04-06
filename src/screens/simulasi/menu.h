@@ -15,6 +15,6 @@ typedef enum {
 } ScreenType;
 
 void       MenuInit(void);
-ScreenType MenuUpdate(void);   // kembalikan screen yang dipilih
+ScreenType MenuUpdate(void);  
 
-#endif // MENU_H
+#endif 

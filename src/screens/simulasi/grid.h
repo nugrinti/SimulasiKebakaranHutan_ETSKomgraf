@@ -20,10 +20,6 @@ typedef struct {
     int  originY;  // pojok kiri atas area grid (layar)
 } ForestGrid;
 
-// -----------------------------------------------------------------------------
-// API publik
-// -----------------------------------------------------------------------------
-
 // Inisialisasi seluruh grid pohon
 void GridInit(ForestGrid *g, int originX, int originY, int cellW, int cellH);
 
@@ -44,4 +40,4 @@ void GridReset(ForestGrid *g);
 // Mengembalikan 1 jika dalam batas grid, 0 jika di luar
 int GridPickCell(const ForestGrid *g, int mx, int my, int *outCol, int *outRow);
 
-#endif // GRID_H
+#endif 

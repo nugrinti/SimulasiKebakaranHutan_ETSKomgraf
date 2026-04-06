@@ -3,6 +3,7 @@
 #include "grid.h"
 #include "tree.h"
 #include "wind.h"
+#include "particle.h"
 #include "src/ui/ui.h"
 #include "src/screens/simulasi/menu.h"
 #include "src/algo/bresenham.h"
@@ -72,6 +73,7 @@ void FireSimInit(void) {
     GridInit(&forest, 20, 220, 64, 32);
     WindInit();
     InitRain();
+    ParticleInit();
 }
 
 ScreenType FireSimUpdate(void) {
@@ -119,11 +121,13 @@ ScreenType FireSimUpdate(void) {
         GridReset(&forest);
         rainActive = 0;
         igniteMode = 0;
+        ParticleReset();
     }
 
     // Update grid & angin
     simTime += dt;
     GridUpdate(&forest, dt, WindGetDirX(), WindGetDirY(), WindGetSpeed());
+    ParticleUpdate(dt, WindGetDirX(), WindGetDirY(), WindGetSpeed());
     WindUpdate(dt, COMPASS_CX, COMPASS_CY);
 
     // ================================================================
@@ -135,6 +139,7 @@ ScreenType FireSimUpdate(void) {
     TerrainDraw();
     WindDraw(COMPASS_CX, COMPASS_CY);   // garis angin + kompas
     GridDraw(&forest, simTime, WindGetSpeed());
+    ParticleDraw();
     if (rainActive) UpdateDrawRain(dt);
 
     // Panel UI

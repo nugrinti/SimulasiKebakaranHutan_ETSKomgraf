@@ -25,10 +25,6 @@ typedef struct {
     float burnTimer;     // detik tersisa sebelum jadi BURNED (misal 3.0f)
 } Tree;
 
-// -----------------------------------------------------------------------------
-// API publik
-// -----------------------------------------------------------------------------
-
 // Inisialisasi pohon di posisi (sx, sy) layar
 void TreeInit(Tree *t, int sx, int sy, int trunkW, int trunkH, int crownSize);
 
@@ -38,4 +34,4 @@ void TreeUpdate(Tree *t, float dt);
 // Gambar pohon sesuai state-nya
 void TreeDraw(const Tree *t, float time, float windSpeed);
 
-#endif // TREE_H
+#endif

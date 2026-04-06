@@ -4,11 +4,10 @@
 
 // -----------------------------------------------------------------------------
 // Entry point screen simulasi kebakaran hutan
-// Dipanggil dari main.c seperti screen lainnya di repo
 // -----------------------------------------------------------------------------
 
 void FireSimInit(void);
-ScreenType FireSimUpdate(void);   // update + draw dalam satu fungsi (pola repo ini)
+ScreenType FireSimUpdate(void);   
 void FireSimUnload(void);
 
-#endif // FIRE_SIM_H
+#endif 

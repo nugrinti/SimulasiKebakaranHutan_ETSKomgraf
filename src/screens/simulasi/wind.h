@@ -11,8 +11,7 @@
 // Inisialisasi sistem angin
 void WindInit(void);
 
-// Update posisi partikel garis angin + baca input kompas
-// cx, cy = posisi tengah kompas di layar
+// Update logika angin — gerakkan garis + baca input kompas
 void WindUpdate(float dt, int compassCX, int compassCY);
 
 // Gambar semua elemen angin (garis + kompas)
@@ -22,6 +21,6 @@ void WindDraw(int compassCX, int compassCY);
 float WindGetDirX(void);    // komponen X arah angin (-1 .. 1)
 float WindGetDirY(void);    // komponen Y arah angin (-1 .. 1)
 float WindGetSpeed(void);   // kecepatan angin (0 .. 1)
-void  WindSetSpeed(float s); // dipanggil dari slider di fire_sim.c
+void  WindSetSpeed(float s); 
 
-#endif // WIND_H
+#endif 

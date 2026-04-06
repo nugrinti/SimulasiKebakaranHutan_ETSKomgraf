@@ -72,13 +72,13 @@ ScreenType MenuUpdate(void) {
         unsigned char alpha = 40 + (unsigned char)(decoR[i] * 3);
         Color dCol = (Color){50, 120, 50, alpha};
         Midcircle((int)decoX[i], (int)decoY[i], decoR[i], dCol);
-        // Batang kecil — BresenhamLine repo
+        // Batang kecil
         BresenhamLine((int)decoX[i], (int)decoY[i],
                       (int)decoX[i], (int)decoY[i] + decoR[i] + 4,
                       (Color){80, 50, 20, alpha});
     }
 
-    // Garis dekoratif atas & bawah — BresenhamLine repo
+    // Garis dekoratif atas & bawah
     for (int off = 0; off < 3; off++) {
         BresenhamLine(0, 70 + off, SW, 70 + off, (Color){80, 160, 60, 120});
         BresenhamLine(0, SH - 50 + off, SW, SH - 50 + off, (Color){80, 160, 60, 80});

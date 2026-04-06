@@ -1,5 +1,6 @@
 #include "grid.h"
 #include "tree.h"
+#include "particle.h"
 #include <math.h>
 #include <stdlib.h>   // rand()
 
@@ -34,7 +35,6 @@ void GridUpdate(ForestGrid *g, float dt,
                 float windDirX, float windDirY, float windSpeed)
 {
     // Tandai pohon yang akan terbakar di frame ini
-    // (jangan langsung ubah state agar tidak cascade dalam 1 frame)
     int willIgnite[GRID_ROWS][GRID_COLS] = {0};
 
     for (int r = 0; r < GRID_ROWS; r++) {
@@ -79,13 +79,22 @@ void GridUpdate(ForestGrid *g, float dt,
         }
     }
 
-    // Terapkan ignition
+    // Terapkan ignition + spawn asap
     for (int r = 0; r < GRID_ROWS; r++) {
         for (int c = 0; c < GRID_COLS; c++) {
+            // Ignition
             if (willIgnite[r][c]) {
-                g->trees[r][c].state = TREE_BURNING;
-                // Reset burn timer
+                g->trees[r][c].state     = TREE_BURNING;
                 g->trees[r][c].burnTimer = 2.5f + (float)(rand() % 30) * 0.1f;
+            }
+            // Spawn asap untuk pohon yang terbakar
+            if (g->trees[r][c].state == TREE_BURNING) {
+                if (GetRandomValue(0, 8) == 0) {
+                    int tx = g->trees[r][c].x;
+                    int ty = g->trees[r][c].y - g->trees[r][c].trunkH
+                             - g->trees[r][c].crownSize;
+                    ParticleSpawn(tx, ty);
+                }
             }
         }
     }

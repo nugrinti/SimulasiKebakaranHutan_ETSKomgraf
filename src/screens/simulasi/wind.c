@@ -1,7 +1,7 @@
 #include "wind.h"
-#include "src/algo/dda.h"           // DDALine() untuk garis angin
-#include "src/algo/bresenham.h"     // BresenhamLine() untuk jarum kompas
-#include "src/algo/midcircle.h"     // Midcircle() untuk lingkaran kompas
+#include "src/algo/dda.h"          
+#include "src/algo/bresenham.h"     
+#include "src/algo/midcircle.h"     
 #include "raylib.h"
 #include <math.h>
 
@@ -118,8 +118,6 @@ void WindUpdate(float dt, int compassCX, int compassCY) {
 
 // =============================================================================
 // WindDraw
-//   1. Garis angin (DDALine dari repo) dengan alpha
-//   2. Kompas: lingkaran (Midcircle dari repo) + jarum (BresenhamLine dari repo)
 // =============================================================================
 void WindDraw(int compassCX, int compassCY) {
 
@@ -129,8 +127,6 @@ void WindDraw(int compassCX, int compassCY) {
 
     // ------------------------------------------------------------------
     // 1. Garis-garis angin bergerak
-    //    DDALine() dipakai karena arah diagonal bebas (semua sudut)
-    //    Panjang garis proporsional ke windSpd
     // ------------------------------------------------------------------
     int lineLen = (int)(windSpd * 18.0f) + 6;   // 6..24 px
 
@@ -145,7 +141,6 @@ void WindDraw(int compassCX, int compassCY) {
         int x2 = x1 + (int)(dirX * lineLen);
         int y2 = y1 + (int)(dirY * lineLen);
 
-        // Garis utama — DDALine dari repo
         DDALine(x1, y1, x2, y2, wCol);
 
         // Kepala panah kecil (2 garis pendek)
@@ -162,9 +157,6 @@ void WindDraw(int compassCX, int compassCY) {
 
     // ------------------------------------------------------------------
     // 2. Kompas interaktif
-    //    Lingkaran luar    → Midcircle() dari repo
-    //    Jarum arah angin  → BresenhamLine() dari repo
-    //    Titik tengah      → DrawPixel()
     // ------------------------------------------------------------------
     #define COMPASS_R     40
     #define COMPASS_R2    28   // radius jarum
@@ -177,7 +169,7 @@ void WindDraw(int compassCX, int compassCY) {
     Midcircle(compassCX, compassCY, COMPASS_R - 4,
               (Color){100, 100, 130, 150});
 
-    // Background kompas — isi manual pakai scan line
+    // Background kompas 
     for (int dy2 = -COMPASS_R + 1; dy2 < COMPASS_R; dy2++) {
         float hw = sqrtf((float)(COMPASS_R * COMPASS_R - dy2 * dy2));
         int x1   = compassCX - (int)hw + 1;
@@ -186,17 +178,17 @@ void WindDraw(int compassCX, int compassCY) {
         BresenhamLine(x1, compassCY + dy2, x2, compassCY + dy2,
                       (Color){20, 25, 40, alpha});
     }
-    // Gambar ulang lingkaran luar di atas isi (agar tidak tertutup)
+    
     Midcircle(compassCX, compassCY, COMPASS_R,
               (Color){200, 200, 230, 255});
 
-    // Tanda arah mata angin (N, S, E, W) — DrawText Raylib
+    // Tanda arah mata angin (N, S, E, W) 
     DrawText("U", compassCX - 4,  compassCY - COMPASS_R - 14, 11, WHITE);
     DrawText("S", compassCX - 4,  compassCY + COMPASS_R + 3,  11, WHITE);
     DrawText("T", compassCX + COMPASS_R + 3,  compassCY - 5,  11, WHITE);
     DrawText("B", compassCX - COMPASS_R - 12, compassCY - 5,  11, WHITE);
 
-    // Jarum kompas — BresenhamLine() dari repo
+    // Jarum kompas 
     // Ujung jarum mengikuti windAngle
     int needleX = compassCX + (int)(dirX * COMPASS_R2);
     int needleY = compassCY + (int)(dirY * COMPASS_R2);
@@ -224,10 +216,9 @@ void WindDraw(int compassCX, int compassCY) {
     // Label sudut angin
     // char angLabel[20];
     int  degInt = (int)windAngle;
-    // Terjemahkan sudut ke nama arah
     const char *dirName;
     if      (degInt < 23  || degInt >= 338) dirName = "Timur";
-    else if (degInt < 68)                   dirName = "Timur Daya";
+    else if (degInt < 68)                   dirName = "Tenggara";
     else if (degInt < 113)                  dirName = "Selatan";
     else if (degInt < 158)                  dirName = "Barat Daya";
     else if (degInt < 203)                  dirName = "Barat";
