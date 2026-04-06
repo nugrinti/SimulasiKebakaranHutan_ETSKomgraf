@@ -15,12 +15,11 @@ void GridInit(ForestGrid *g, int originX, int originY, int cellW, int cellH) {
     for (int r = 0; r < GRID_ROWS; r++) {
         for (int c = 0; c < GRID_COLS; c++) {
             // Posisi tengah bawah pohon dalam sel
-            int sx = originX + c * cellW + cellW / 2;
-            int sy = originY + r * cellH + cellH - 4;  // sedikit margin bawah
-            TreeInit(&g->trees[r][c], sx, sy,
-                     6,              // trunkW
-                     cellH / 3,      // trunkH
-                     cellW / 3);     // crownSize
+            int sx = originX + c * cellW + cellW / 2 + GetRandomValue(-30, 8);
+            int sy = originY + r * cellH + cellH - 4 + GetRandomValue(-4, 30);
+            int trunkH = cellH/3 + GetRandomValue(-3,4);
+            int crownSize = cellW/3 + GetRandomValue(-3, 4);
+            TreeInit(&g->trees[r][c], sx, sy, 6, trunkH, crownSize);
         }
     }
 }
@@ -95,10 +94,10 @@ void GridUpdate(ForestGrid *g, float dt,
 // =============================================================================
 // GridDraw
 // =============================================================================
-void GridDraw(const ForestGrid *g) {
+void GridDraw(const ForestGrid *g, float time, float windSpeed) {
     for (int r = 0; r < GRID_ROWS; r++) {
         for (int c = 0; c < GRID_COLS; c++) {
-            TreeDraw(&g->trees[r][c]);
+            TreeDraw(&g->trees[r][c], time, windSpeed);
         }
     }
 }

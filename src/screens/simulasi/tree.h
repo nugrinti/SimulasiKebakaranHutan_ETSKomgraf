@@ -36,6 +36,6 @@ void TreeInit(Tree *t, int sx, int sy, int trunkW, int trunkH, int crownSize);
 void TreeUpdate(Tree *t, float dt);
 
 // Gambar pohon sesuai state-nya
-void TreeDraw(const Tree *t);
+void TreeDraw(const Tree *t, float time, float windSpeed);
 
 #endif // TREE_H

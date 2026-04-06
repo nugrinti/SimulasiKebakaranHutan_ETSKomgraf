@@ -74,12 +74,16 @@ void TreeUpdate(Tree *t, float dt) {
 //   mahkota  : 3 segitiga berlapis di atas batang
 //   bayangan : ellips pipih di bawah batang
 // =============================================================================
-void TreeDraw(const Tree *t) {
+void TreeDraw(const Tree *t, float time, float windSpeed) {
 
-    int cx  = t->x;
-    int by  = t->y;                    // bawah batang (layar)
-    int ty  = by - t->trunkH;         // atas batang  (layar)
-    int hw  = t->trunkW / 2;          // setengah lebar batang
+    // Pohon bergoyang saat angin kencang (nomor 2)
+    // Offset horizontal berdasarkan sin(time) * windSpeed
+    int windOffset = (int)(sinf(time * 2.5f + t->x * 0.05f) * windSpeed * 4.0f);
+
+    int cx  = t->x + windOffset;   // ← cx bergeser sesuai angin
+    int by  = t->y;
+    int ty  = by - t->trunkH;
+    int hw  = t->trunkW / 2;
 
     // ------------------------------------------------------------------
     // POHON SEHAT — hijau
@@ -112,9 +116,11 @@ void TreeDraw(const Tree *t) {
         // 4. Mahkota — 3 segitiga berlapis (bawah → atas, makin kecil)
         //    Layer 1 (paling bawah, paling lebar)
         int cs = t->crownSize;
-        Color darkGreen  = (Color){34,  85,  34,  255};
-        Color green      = (Color){50,  120, 50,  255};
-        Color lightGreen = (Color){80,  160, 60,  255};
+
+        int seed = (cx * 7 + by * 13) % 40;
+        Color darkGreen  = (Color){(unsigned char)(25 + seed/2), (unsigned char)(70 + seed),  (unsigned char)(20 + seed/3), 255};
+        Color green      = (Color){(unsigned char)(40 + seed/2), (unsigned char)(105 + seed), (unsigned char)(35 + seed/3), 255};
+        Color lightGreen = (Color){(unsigned char)(70 + seed/2), (unsigned char)(145 + seed), (unsigned char)(50 + seed/3), 255};
 
         // Layer 1
         FillTriangle(cx,            ty - cs,
@@ -168,15 +174,17 @@ void TreeDraw(const Tree *t) {
                      fireRed);
 
         // "Lidah api" — beberapa garis DDA pendek ke atas dari puncak
-        // Menggunakan BresenhamLine (dari repo) karena arahnya vertikal
         int tipY = ty - cs;
-        BresenhamLine(cx,     tipY,      cx,     tipY - 8,  fireYellow);
-        BresenhamLine(cx - 3, tipY - 2,  cx - 3, tipY - 6,  fireOrange);
-        BresenhamLine(cx + 3, tipY - 2,  cx + 3, tipY - 6,  fireOrange);
-        BresenhamLine(cx - 6, tipY,      cx - 4, tipY - 4,  fireRed);
-        BresenhamLine(cx + 6, tipY,      cx + 4, tipY - 4,  fireRed);
-    }
+        // Offset api bergerak: sin(time) untuk goyang kiri-kanan
+        int fx = (int)(sinf(time * 6.0f + t->x * 0.1f) * 3.0f);
+        int fy = (int)(sinf(time * 8.0f + t->x * 0.1f) * 2.0f);  // naik-turun sedikit
 
+        BresenhamLine(cx,         tipY,        cx + fx,      tipY - 8  + fy, fireYellow);
+        BresenhamLine(cx - 3,     tipY - 2,    cx - 3 + fx,  tipY - 6  + fy, fireOrange);
+        BresenhamLine(cx + 3,     tipY - 2,    cx + 3 + fx,  tipY - 6  + fy, fireOrange);
+        BresenhamLine(cx - 6,     tipY,        cx - 4 + fx,  tipY - 4  + fy, fireRed);
+        BresenhamLine(cx + 6,     tipY,        cx + 4 + fx,  tipY - 4  + fy, fireRed);
+    }
     // ------------------------------------------------------------------
     // POHON HANGUS — hanya batang hitam + sisa abu
     // ------------------------------------------------------------------

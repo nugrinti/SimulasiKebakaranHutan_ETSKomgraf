@@ -32,7 +32,7 @@ void GridInit(ForestGrid *g, int originX, int originY, int cellW, int cellH);
 void GridUpdate(ForestGrid *g, float dt, float windDirX, float windDirY, float windSpeed);
 
 // Gambar semua pohon dalam grid
-void GridDraw(const ForestGrid *g);
+void GridDraw(const ForestGrid *g, float time, float windSpeed);
 
 // Picu api pada pohon di sel (col, row) — dipanggil saat user klik
 void GridIgnite(ForestGrid *g, int col, int row);

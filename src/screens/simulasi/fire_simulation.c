@@ -18,6 +18,7 @@ static float rainTimer   = 0.0f;
 static float rainX[RAIN_COUNT];
 static float rainY[RAIN_COUNT];
 static float rainSpeedY[RAIN_COUNT];
+static float simTime = 0.0f;
 
 #define COMPASS_CX  900
 #define COMPASS_CY  120
@@ -33,37 +34,6 @@ static float rainSpeedY[RAIN_COUNT];
 #define SLIDER_X    400
 #define SLIDER_Y    600
 #define SLIDER_W    200
-
-// static void DrawButton(int x, int y, int w, int h,
-//                         Color fill, Color border,
-//                         const char *label, Color textCol) {
-//     for (int row = y; row <= y + h; row++)
-//         BresenhamLine(x, row, x + w, row, fill);
-//     BresenhamLine(x,     y,     x + w, y,     border);
-//     BresenhamLine(x,     y + h, x + w, y + h, border);
-//     BresenhamLine(x,     y,     x,     y + h, border);
-//     BresenhamLine(x + w, y,     x + w, y + h, border);
-//     int tw = MeasureText(label, 14);
-//     DrawText(label, x + (w - tw) / 2, y + (h - 14) / 2, 14, textCol);
-// }
-
-// static int IsMouseOver(int x, int y, int w, int h) {
-//     Vector2 m = GetMousePosition();
-//     return (m.x >= x && m.x <= x + w && m.y >= y && m.y <= y + h);
-// }
-
-// static void DrawSlider(int x, int y, int w, float value,
-//                         Color track, Color thumb) {
-//     for (int off = -2; off <= 2; off++)
-//         BresenhamLine(x, y + off, x + w, y + off, track);
-//     int tx = x + (int)(value * w);
-//     for (int row = y - 7; row <= y + 7; row++)
-//         BresenhamLine(tx - 5, row, tx + 5, row, thumb);
-//     BresenhamLine(tx - 5, y - 7, tx + 5, y - 7, WHITE);
-//     BresenhamLine(tx - 5, y + 7, tx + 5, y + 7, WHITE);
-//     BresenhamLine(tx - 5, y - 7, tx - 5, y + 7, WHITE);
-//     BresenhamLine(tx + 5, y - 7, tx + 5, y + 7, WHITE);
-// }
 
 static void InitRain(void) {
     for (int i = 0; i < RAIN_COUNT; i++) {
@@ -107,7 +77,6 @@ void FireSimInit(void) {
 ScreenType FireSimUpdate(void) {
     float dt = GetFrameTime();
 
-    // Di bagian DRAW, ubah pemanggilan DrawSlider jadi:
     float newSpd = DrawSlider(SLIDER_X, SLIDER_Y, SLIDER_W,
                             WindGetSpeed(),
                             (Color){70,70,90,255}, (Color){255,180,50,255}, NULL);
@@ -153,6 +122,7 @@ ScreenType FireSimUpdate(void) {
     }
 
     // Update grid & angin
+    simTime += dt;
     GridUpdate(&forest, dt, WindGetDirX(), WindGetDirY(), WindGetSpeed());
     WindUpdate(dt, COMPASS_CX, COMPASS_CY);
 
@@ -164,7 +134,7 @@ ScreenType FireSimUpdate(void) {
 
     TerrainDraw();
     WindDraw(COMPASS_CX, COMPASS_CY);   // garis angin + kompas
-    GridDraw(&forest);
+    GridDraw(&forest, simTime, WindGetSpeed());
     if (rainActive) UpdateDrawRain(dt);
 
     // Panel UI
@@ -205,9 +175,6 @@ ScreenType FireSimUpdate(void) {
     sprintf(buf, "Sehat   : %d", healthy);  DrawText(buf, 10, 580, 12, GREEN);
     sprintf(buf, "Terbakar: %d", burning);  DrawText(buf, 10, 600, 12, ORANGE);
     sprintf(buf, "Hangus  : %d", burned);   DrawText(buf, 10, 620, 12, GRAY);
-
-    // DrawText("Klik pohon untuk mulai api (aktifkan Picu Api dulu) | Drag kompas = ubah arah angin",
-    //          10, SCREEN_H - 18, 10, (Color){180,180,180,200});
     
     if (DrawButton(10, 10, 120, 30,
                 (Color){30,30,30,200}, (Color){80,160,60,255},
